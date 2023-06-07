@@ -84,6 +84,8 @@ subprojects {
             defaultConfig {
                 minSdk = androidMinSdkVersion
                 if (this is ApplicationDefaultConfig) {
+                    applicationId = "me.longhuan.ks"
+                    resValue("string", "app_name", "LongHuanKS")
                     targetSdk = androidTargetSdkVersion
                     versionCode = managerVersionCode
                     versionName = managerVersionName

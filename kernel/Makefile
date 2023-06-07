@@ -29,7 +29,7 @@ KSU_EXPECTED_SIZE := 0x033b
 endif
 
 ifndef KSU_EXPECTED_HASH
-KSU_EXPECTED_HASH := 0xb0b91415
+KSU_EXPECTED_HASH := 0x417a01ad
 endif
 
 $(info -- KernelSU Manager signature size: $(KSU_EXPECTED_SIZE))
