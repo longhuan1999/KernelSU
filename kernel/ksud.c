@@ -283,17 +283,16 @@ int ksu_handle_vfs_read(struct file **file_ptr, char __user **buf_ptr,
 
 	size_t rc_count = strlen(KERNEL_SU_RC);
 
-	pr_info("vfs_read: %s, comm: %s, count: %d, rc_count: %d\n", dpath,
+	pr_info("vfs_read: %s, comm: %s, count: %zu, rc_count: %zu\n", dpath,
 		current->comm, count, rc_count);
-
 	if (count < rc_count) {
-		pr_err("count: %d < rc_count: %d", count, rc_count);
+		pr_err("count: %zu < rc_count: %zu", count, rc_count);
 		return 0;
 	}
 
 	size_t ret = copy_to_user(buf, KERNEL_SU_RC, rc_count);
 	if (ret) {
-		pr_err("copy ksud.rc failed: %d\n", ret);
+		pr_err("copy ksud.rc failed: %zu\n", ret);
 		return 0;
 	}
 
@@ -383,9 +382,9 @@ static int execve_handler_pre(struct kprobe *p, struct pt_regs *regs)
 #ifdef CONFIG_COMPAT
 	argv.is_compat = PT_REGS_PARM3(regs);
 	if (unlikely(argv.is_compat)) {
-		argv.ptr.compat = PT_REGS_CCALL_PARM4(regs);
+		argv.ptr.compat = (void *)PT_REGS_CCALL_PARM4(regs);
 	} else {
-		argv.ptr.native = PT_REGS_CCALL_PARM4(regs);
+		argv.ptr.native = (void *)PT_REGS_CCALL_PARM4(regs);
 	}
 #else
 	argv.ptr.native = PT_REGS_PARM3(regs);
