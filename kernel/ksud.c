@@ -154,8 +154,9 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
 	static const char system_bin_init[] = "/system/bin/init";
 	static bool init_second_stage_executed = false;
 
-	if (!filename_ptr)
+	if (!filename_ptr) {
 		return 0;
+	}
 
 	filename = *filename_ptr;
 	if (IS_ERR(filename)) {
