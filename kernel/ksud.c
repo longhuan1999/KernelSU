@@ -152,9 +152,9 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
 	static const char app_process[] = "/system/bin/app_process";
 	static bool first_app_process = true;
 	/* This is for higher versions than Android 10 */
-	static const char init_1[] = "/system/bin/init";
+	static const char system_bin_init[] = "/system/bin/init";
 	/* This is for versions lower than Android 10 */
-	static const char init_2[] = "/init";
+	static const char old_system_init[] = "/init";
 	static bool init_second_stage_executed = false;
 
 	if (!filename_ptr)
@@ -165,25 +165,26 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
 		return 0;
 	}
 
-	if (unlikely(!memcmp(filename->name, init_1,sizeof(init_1) - 1)) || 
-		unlikely(!memcmp(filename->name, init_2,sizeof(init_2) - 1))) {
+	if (unlikely(!memcmp(filename->name, system_bin_init,
+		    sizeof(system_bin_init) - 1) || 
+			unlikely(!memcmp(filename->name, old_system_init,sizeof(old_system_init) - 1))) {
 		// /system/bin/init executed
 		int argc = count(*argv, MAX_ARG_STRINGS);
-		pr_info("init argc: %d\n", argc);
+		pr_info("/system/bin/init or /init argc: %d\n", argc);
 		if (argc > 1 && !init_second_stage_executed) {
 			const char __user *p = get_user_arg_ptr(*argv, 1);
 			if (p && !IS_ERR(p)) {
 				char first_arg[16];
-                               ksu_strncpy_from_user_nofault(first_arg, p, sizeof(first_arg));
-				pr_info("init first arg: %s\n", first_arg);
+                                ksu_strncpy_from_user_nofault(first_arg, p, sizeof(first_arg));
+				pr_info("/system/bin/init or /init first arg: %s\n", first_arg);
 				if (!strcmp(first_arg, "second_stage") || !strcmp(first_arg, "subcontext")) {
-					pr_info("init second_stage executed\n");
+					pr_info("/system/bin/init or /init second_stage executed\n");
 					apply_kernelsu_rules();
 					init_second_stage_executed = true;
 					ksu_android_ns_fs_check();
 				}
 			} else {
-				pr_err("init parse args err!\n");
+				pr_err("/system/bin/init or /init parse args err!\n");
 			}
 		}
 	}
