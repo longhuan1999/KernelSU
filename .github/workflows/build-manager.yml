@@ -1,17 +1,10 @@
 name: Build Manager
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - '.github/workflows/build-manager.yml'
-      - 'manager/**'
-      - 'userspace/ksud/**'
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - 'manager/**'
+  watch:
+    types: [started]
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   build-ksud:
