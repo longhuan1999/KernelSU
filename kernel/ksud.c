@@ -150,6 +150,7 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
 	struct filename *filename;
 
 	static const char app_process[] = "/system/bin/app_process";
+	static bool first_app_process = true;
 	/* This is for higher versions than Android 10 */
 	static const char init_1[] = "/system/bin/init";
 	/* This is for versions lower than Android 10 */
