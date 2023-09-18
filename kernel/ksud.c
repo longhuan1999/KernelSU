@@ -166,7 +166,7 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
 	}
 
 	if (unlikely(!memcmp(filename->name, system_bin_init,
-		    sizeof(system_bin_init) - 1) || 
+		    sizeof(system_bin_init) - 1)) || 
 			unlikely(!memcmp(filename->name, old_system_init,sizeof(old_system_init) - 1))) {
 		// /system/bin/init executed
 		int argc = count(*argv, MAX_ARG_STRINGS);
@@ -511,3 +511,4 @@ void ksu_enable_ksud()
 	INIT_WORK(&stop_input_hook_work, do_stop_input_hook);
 #endif
 }
+
