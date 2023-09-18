@@ -511,4 +511,3 @@ void ksu_enable_ksud()
 	INIT_WORK(&stop_input_hook_work, do_stop_input_hook);
 #endif
 }
-

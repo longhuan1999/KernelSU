@@ -25,11 +25,11 @@ ccflags-y += -DKSU_VERSION=16
 endif
 
 ifndef KSU_EXPECTED_SIZE
-KSU_EXPECTED_SIZE := 0x033b
+KSU_EXPECTED_SIZE := 0x5fb
 endif
 
 ifndef KSU_EXPECTED_HASH
-KSU_EXPECTED_HASH := 0xb0b91415
+KSU_EXPECTED_HASH := 0x417a01ad
 endif
 
 $(info -- KernelSU Manager signature size: $(KSU_EXPECTED_SIZE))

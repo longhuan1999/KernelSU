@@ -93,19 +93,22 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 	const char sh[] = KSUD_PATH;
 	const char su[] = SU_PATH;
 
-	if (unlikely(!filename_ptr))
+	if (unlikely(!filename_ptr)) {
 		return 0;
+	}
 
 	filename = *filename_ptr;
 	if (IS_ERR(filename)) {
 		return 0;
 	}
 
-	if (likely(memcmp(filename->name, su, sizeof(su))))
+	if (likely(memcmp(filename->name, su, sizeof(su)))) {
 		return 0;
+	}
 
-	if (!ksu_is_allow_uid(current_uid().val))
+	if (!ksu_is_allow_uid(current_uid().val)) {
 		return 0;
+	}
 
 	pr_info("do_execveat_common su found\n");
 	memcpy((void *)filename->name, sh, sizeof(sh));
