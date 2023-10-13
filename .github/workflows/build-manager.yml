@@ -1,17 +1,10 @@
 name: Build Manager
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - '.github/workflows/build-manager.yml'
-      - 'manager/**'
-      - 'userspace/ksud/**'
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - 'manager/**'
+  watch:
+    types: [started]
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   build-ksud:
@@ -102,13 +95,13 @@ jobs:
             echo 'android.native.buildOutput=verbose'
           } >> gradle.properties
           sed -i 's/org.gradle.configuration-cache=true//g' gradle.properties
-          ./gradlew clean assembleRelease
+          ./gradlew clean assemble
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: manager
-          path: manager/app/build/outputs/apk/release/*.apk
+          path: manager/app/build/outputs/apk
 
       - name: Bot session cache
         if: github.event_name != 'pull_request' && steps.need_upload.outputs.UPLOAD == 'true'
@@ -131,7 +124,7 @@ jobs:
         run: |
           if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)
-            APK=$(find ./app/build/outputs/apk/release -name "*.apk")
+            APK=$(find ./app/build/outputs/apk -name "*.apk")
             pip3 install telethon==1.31.1
             python3 $GITHUB_WORKSPACE/scripts/ksubot.py $APK
           fi
