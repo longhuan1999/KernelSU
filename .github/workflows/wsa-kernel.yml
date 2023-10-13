@@ -102,8 +102,13 @@ jobs:
             export KSU_EXPECTED_SIZE=${{ vars.EXPECTED_SIZE }}
             export KSU_EXPECTED_HASH=${{ vars.EXPECTED_HASH }}
           fi
+          if [ ! -z "${{ vars.APP_ID }}" ]; then
+            export KSU_MANAGER_PACKAGE=${{ vars.APP_ID }}
+          fi
           declare -A ARCH_MAP=(["x86_64"]="x64" ["arm64"]="arm64")
           cp configs/wsa/config-wsa-${ARCH_MAP[${{ inputs.arch }}]} .config
+          sed -i "s/CONFIG_WERROR=y/CONFIG_WERROR=n/g" .config
+          sed -i "s/CONFIG_FRAME_WARN=2048/CONFIG_FRAME_WARN=4096/g" .config
           make olddefconfig
           declare -A FILE_NAME=(["x86_64"]="bzImage" ["arm64"]="Image")
           make -j`nproc` LLVM=1 ARCH=${{ inputs.arch }} $(if [ "${{ inputs.arch }}" == "arm64" ]; then echo CROSS_COMPILE=aarch64-linux-gnu; fi) ${FILE_NAME[${{ inputs.arch }}]} CCACHE="/usr/bin/ccache"
