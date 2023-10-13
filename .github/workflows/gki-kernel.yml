@@ -143,7 +143,7 @@ jobs:
 
           if [ "$IS_DEBUG_KERNEL" = "true" ]; then
             echo "[+] Enable debug features for kernel"
-            printf "\nccflags-y += -DCONFIG_KSU_DEBUG\n" >> $GITHUB_WORKSPACE/KernelSU/kernel/Makefile
+            sed -i '/config KSU_DEBUG/,/help/{s/default n/default y/}' $GITHUB_WORKSPACE/KernelSU/kernel/Kconfig
           fi
           repo status
           echo "[+] KernelSU setup done."
