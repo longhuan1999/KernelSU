@@ -15,6 +15,7 @@ on:
       - ".github/scripts/build-a12.sh"
       - "kernel/**"
   workflow_call:
+  workflow_dispatch:
 jobs:
   build-kernel:
     if: github.event_name != 'pull_request' && github.ref != 'refs/heads/checkci'

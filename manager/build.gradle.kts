@@ -75,6 +75,13 @@ subprojects {
             defaultConfig {
                 minSdk = androidMinSdkVersion
                 if (this is ApplicationDefaultConfig) {
+                    val defaultAppId = "me.weishu.kernelsu"
+                    val defaultAppName = "KernelSU"
+                    val properties = project.properties
+                    val appId = properties["myAppId"] as? String ?: defaultAppId
+                    val appName = properties["myAppName"] as? String ?: defaultAppName
+                    applicationId = appId
+                    resValue("string", "app_name", appName)
                     targetSdk = androidTargetSdkVersion
                     versionCode = managerVersionCode
                     versionName = managerVersionName
