@@ -440,9 +440,9 @@ static int execve_handler_pre(struct kprobe *p, struct pt_regs *regs)
 #ifdef CONFIG_COMPAT
 	argv.is_compat = PT_REGS_PARM3(regs);
 	if (unlikely(argv.is_compat)) {
-		argv.ptr.compat = PT_REGS_CCALL_PARM4(regs);
+		argv.ptr.compat = (void *)PT_REGS_CCALL_PARM4(regs);
 	} else {
-		argv.ptr.native = PT_REGS_CCALL_PARM4(regs);
+		argv.ptr.native = (void *)PT_REGS_CCALL_PARM4(regs);
 	}
 #else
 	argv.ptr.native = PT_REGS_PARM3(regs);
