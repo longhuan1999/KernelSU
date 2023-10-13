@@ -29,3 +29,13 @@ jobs:
       tag: android13-${{ matrix.version }}-${{ matrix.os_patch_level }}
       patch_path: ${{ matrix.version }}
       debug: true
+  build-debug-kernel-wsa:
+    strategy:
+      matrix:
+        arch: [x86_64, arm64]
+        version: ["5.15.104.4",]
+    uses: ./.github/workflows/wsa-kernel.yml
+    with:
+      arch: ${{ matrix.arch }}
+      version: ${{ matrix.version }}
+      debug: true
