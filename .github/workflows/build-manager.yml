@@ -56,6 +56,12 @@ jobs:
             echo KEYSTORE_FILE='../key.jks' >> gradle.properties
             echo ${{ secrets.KEYSTORE }} | base64 --decode > key.jks
           fi
+          if [ ! -z "${{ vars.APP_ID }}" ]; then
+            echo myAppId='${{ vars.APP_ID }}' >> gradle.properties
+          fi
+          if [ ! -z "${{ vars.APP_NAME }}" ]; then
+            echo myAppName='${{ vars.APP_NAME }}' >> gradle.properties
+          fi
 
       - name: Setup Java
         uses: actions/setup-java@v3
