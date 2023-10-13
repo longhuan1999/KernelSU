@@ -13,6 +13,7 @@ on:
     paths:
       - 'manager/**'
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   build-lkm:
@@ -76,6 +77,12 @@ jobs:
               echo KEYSTORE_FILE='key.jks'
             } >> gradle.properties
             echo ${{ secrets.KEYSTORE }} | base64 -d > key.jks
+          fi
+          if [ ! -z "${{ vars.APP_ID }}" ]; then
+            echo myAppId='${{ vars.APP_ID }}' >> gradle.properties
+          fi
+          if [ ! -z "${{ vars.APP_NAME }}" ]; then
+            echo myAppName='${{ vars.APP_NAME }}' >> gradle.properties
           fi
 
       - name: Setup Java
