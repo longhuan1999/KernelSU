@@ -10,12 +10,8 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref != 'refs/heads/checkci'
     strategy:
       matrix:
-        arch: [x86_64, arm64]
-        version: ["5.15.94.2", "5.15.104.1", "5.15.104.2", "5.15.104.3", "5.15.104.4"]
-    uses: ./.github/workflows/wsa-kernel.yml
-    with:
-      arch: ${{ matrix.arch }}
-      version: ${{ matrix.version }}
+        arch: [x86_64]
+        version: ["5.15.104.3", "5.15.104.4"]
 
   check_build:
     if: (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.ref == 'refs/heads/checkci'
