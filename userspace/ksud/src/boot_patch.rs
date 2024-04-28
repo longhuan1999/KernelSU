@@ -552,9 +552,9 @@ fn find_boot_image(
 
         if !slot_suffix.is_empty() && ota {
             if slot_suffix == "_a" {
-                slot_suffix = "_b".to_string()
+                slot_suffix = "_ab".to_string()
             } else {
-                slot_suffix = "_a".to_string()
+                slot_suffix = "_ab".to_string()
             }
         };
 
