@@ -1,4 +1,4 @@
-name: Build Manager
+name: custom Build Manager
 
 on:
   workflow_call:
@@ -6,14 +6,11 @@ on:
 
 jobs:
   build-lkm:
-    uses: ./.github/workflows/build-lkm.yml
+    uses: ./.github/workflows/build-lkm-custom.yml
     secrets: inherit
 
-  build-ksuinit:
-    uses: ./.github/workflows/ksuinit.yml
-
   build-ksud:
-    needs: [build-lkm, build-ksuinit]
+    needs: build-lkm
     strategy:
       matrix:
         include:
@@ -27,7 +24,7 @@ jobs:
       os: ${{ matrix.os }}
   
   build-ksud-extra:
-    needs: [build-lkm, build-ksuinit]
+    needs: build-lkm
     strategy:
       matrix:
         include:
@@ -55,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -69,7 +66,7 @@ jobs:
           fi
 
       - name: Write key
-        if: ${{ ( github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )) || github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+        if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/main' ) || github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
         run: |
           if [ ! -z "${{ secrets.KEYSTORE }}" ]; then
             {
@@ -100,13 +97,13 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Download arm64 ksud
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v6
         with:
           name: ksud-aarch64-linux-android
           path: .
 
       - name: Download x86_64 ksud
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v6
         with:
           name: ksud-x86_64-linux-android
           path: .
@@ -119,18 +116,18 @@ jobs:
           cp -f ../x86_64-linux-android/release/ksud ../manager/app/src/main/jniLibs/x86_64/libksud.so
 
       - name: Build with Gradle
-        run: ./gradlew clean assembleRelease
+        run: ./gradlew clean assemble
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v6
-        if: ${{ ( github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )) || github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v5
+        if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/main' ) || github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
         with:
           name: manager
           path: manager/app/build/outputs/apk/**/*.apk
 
       - name: Upload mappings
-        uses: actions/upload-artifact@v6
-        if: ${{ ( github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )) || github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v5
+        if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/main' ) || github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
         with:
           name: "mappings"
           path: "manager/app/build/outputs/mapping/release/"
@@ -138,7 +135,7 @@ jobs:
       - name: Bot session cache
         if: github.event_name != 'pull_request' && steps.need_upload.outputs.UPLOAD == 'true'
         id: bot_session_cache
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: scripts/ksubot.session
           key: ${{ runner.os }}-bot-session
