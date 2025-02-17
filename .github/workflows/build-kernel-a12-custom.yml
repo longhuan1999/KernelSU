@@ -1,18 +1,15 @@
-name: Build Kernel - Android 12
+name: Build custom Kernel - Android 12
 on:
   workflow_call:
+  workflow_dispatch:
 jobs:
   build-kernel:
     if: github.event_name != 'pull_request' && github.ref != 'refs/heads/checkci'
     strategy:
       matrix:
         include:
-          - sub_level: 209
-            os_patch_level: 2024-05
-          - sub_level: 218
-            os_patch_level: 2024-08
-          - sub_level: 226
-            os_patch_level: 2024-11
+          - sub_level: 198
+            os_patch_level: 2024-01
     uses: ./.github/workflows/gki-kernel.yml
     secrets: inherit
     with:

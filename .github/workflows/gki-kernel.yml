@@ -55,7 +55,7 @@ on:
         default: false
       enable_susfs:
         description: "Enable SUSFS"
-        required: true
+        required: false
         type: boolean
         default: true
     secrets:
@@ -231,7 +231,10 @@ jobs:
           if [ ! -z "${{ vars.APP_ID }}" ]; then
             export KSU_MANAGER_PACKAGE=${{ vars.APP_ID }}
           fi
+          # Remove check_defconfig
+          sed -i 's/check_defconfig//' ./common/build.config.gki
           if [ -e build/build.sh ]; then
+            sed -i 's/-dirty//' ./common/scripts/setlocalversion
             LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh CC="/usr/bin/ccache clang"
           else
             tools/bazel run --disk_cache=/home/runner/.cache/bazel --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist
