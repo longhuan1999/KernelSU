@@ -1,4 +1,4 @@
-name: Build Manager
+name: custom Build Manager
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-lkm:
-    uses: ./.github/workflows/build-lkm.yml
+    uses: ./.github/workflows/build-lkm-custom.yml
     secrets: inherit
 
   build-ksuinit:
@@ -119,7 +119,7 @@ jobs:
           cp -f ../x86_64-linux-android/release/ksud ../manager/app/src/main/jniLibs/x86_64/libksud.so
 
       - name: Build with Gradle
-        run: ./gradlew clean assembleRelease
+        run: ./gradlew clean assemble
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
