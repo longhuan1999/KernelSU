@@ -1,4 +1,4 @@
-name: Build Kernel - ChromeOS ARCVM
+name: Build custom Kernel - ChromeOS ARCVM
 on:
   workflow_call:
   workflow_dispatch:
@@ -111,9 +111,6 @@ jobs:
           if [ ! -z ${{ vars.EXPECTED_SIZE }} ] && [ ! -z ${{ vars.EXPECTED_HASH }} ]; then
             export KSU_EXPECTED_SIZE=${{ vars.EXPECTED_SIZE }}
             export KSU_EXPECTED_HASH=${{ vars.EXPECTED_HASH }}
-          fi
-          if [ ! -z "${{ vars.APP_ID }}" ]; then
-            export KSU_MANAGER_PACKAGE=${{ vars.APP_ID }}
           fi
 
           make LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc O=${PWD} mrproper

@@ -1,36 +1,31 @@
-name: Release
+name: custom Release
 on:
-  workflow_call:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 jobs:
   build-manager:
-    uses: ./.github/workflows/build-manager.yml
+    uses: ./.github/workflows/build-manager-custom.yml
     secrets: inherit
+    with:
   build-a12-kernel:
-    uses: ./.github/workflows/build-kernel-a12.yml
+    uses: ./.github/workflows/build-kernel-a12-custom.yml
     secrets: inherit
-  build-a13-kernel:
-    uses: ./.github/workflows/build-kernel-a13.yml
-    secrets: inherit
-  build-a14-kernel:
-    uses: ./.github/workflows/build-kernel-a14.yml
-    secrets: inherit
-  build-a15-kernel:
-    uses: ./.github/workflows/build-kernel-a15.yml
-    secrets: inherit
+    with:
   build-wsa-kernel:
-    uses: ./.github/workflows/build-kernel-wsa.yml
+    uses: ./.github/workflows/build-kernel-wsa-custom.yml
     secrets: inherit
+    with:
   build-arcvm-kernel:
-    uses: ./.github/workflows/build-kernel-arcvm.yml
+    uses: ./.github/workflows/build-kernel-arcvm-custom.yml
     secrets: inherit
+    with:
   release:
     needs:
       - build-manager
       - build-a12-kernel
-      - build-a13-kernel
-      - build-a14-kernel
       - build-wsa-kernel
       - build-arcvm-kernel
     runs-on: ubuntu-latest
