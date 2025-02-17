@@ -1,0 +1,31 @@
+name: custom Build debug kernel
+on:
+  workflow_dispatch:
+    inputs:
+      enable_susfs:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-debug-kernel-a12:
+    uses: ./.github/workflows/gki-kernel.yml
+    with:
+      version: android12-5.10
+      version_name: android12-5.10.226
+      tag: android12-5.10-2024-11
+      os_patch_level: 2024-11
+      patch_path: "5.10"
+      debug: true
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}
+  build-debug-kernel-wsa:
+    strategy:
+      matrix:
+        arch: [x86_64, arm64]
+        version: ["5.15.104.4",]
+    uses: ./.github/workflows/wsa-kernel.yml
+    with:
+      arch: ${{ matrix.arch }}
+      version: ${{ matrix.version }}
+      debug: true
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}

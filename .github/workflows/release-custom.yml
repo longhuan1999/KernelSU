@@ -1,18 +1,35 @@
-name: Release
+name: custom Release
 on:
   workflow_dispatch:
+    inputs:
+      enable_susfs:
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-manager:
-    uses: ./.github/workflows/build-manager.yml
+    uses: ./.github/workflows/build-manager-custom.yml
     secrets: inherit
+  build-a12-kernel:
+    uses: ./.github/workflows/build-kernel-a12-custom.yml
+    secrets: inherit
+    with:
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}
+  build-wsa-kernel:
+    uses: ./.github/workflows/build-kernel-wsa-custom.yml
+    secrets: inherit
+    with:
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}
   release:
     needs:
       - build-manager
+      - build-a12-kernel
+      - build-wsa-kernel
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v4
       - name: Rename ksud
         run: |
           mkdir -p ksud
@@ -61,7 +78,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            manager/*.apk
+            manager/**/*.apk
             android*-lkm/*_kernelsu.ko
             AnyKernel3-*.zip
             boot-images-*/Image-*/*.img.gz
