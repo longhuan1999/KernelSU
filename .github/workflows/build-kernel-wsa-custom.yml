@@ -1,4 +1,4 @@
-name: Build Kernel - WSA
+name: Build custom Kernel - WSA
 on:
   workflow_call:
   workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         arch: [x86_64, arm64]
-        version: ["5.15.94.2", "5.15.104.1", "5.15.104.2", "5.15.104.3", "5.15.104.4"]
+        version: ["5.15.104.4",]
     uses: ./.github/workflows/wsa-kernel.yml
     with:
       arch: ${{ matrix.arch }}
