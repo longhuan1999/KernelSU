@@ -53,6 +53,10 @@ on:
         required: false
         type: boolean
         default: false
+      enable_susfs:
+        required: false
+        type: boolean
+        default: false
     secrets:
       BOOT_SIGN_KEY:
         required: false
@@ -203,6 +207,21 @@ jobs:
           git config --global user.name "KernelSUBot"
           cd common/ && git add -A && git commit -a -m "Add KernelSU"
           repo status
+      
+      - name: Apply SUSFS Patches for KernelSU Variants
+        if: ${{ inputs.enable_susfs == true }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "gki-${{ inputs.version }}"
+          git clone https://github.com/WildPlusKernel/kernel_patches.git
+          cp susfs4ksu/kernel_patches/fs/* android-kernel/common/fs/
+          cp susfs4ksu/kernel_patches/include/linux/* android-kernel/common/include/linux/
+          cd $GITHUB_WORKSPACE/KernelSU
+          patch -p1 --forward < $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch
+          sed -i 's/"7e0c6d7278a3bb8e364e0fcba95afaf3666cf5ff3c245a3b63c8833bd0445cc4"/EXPECTED_HASH/' $GITHUB_WORKSPACE/KernelSU/kernel/apk_sign.c
+          cd $GITHUB_WORKSPACE/android-kernel/common
+          patch -p1 < $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.version }}.patch
+          patch -p1 -F 3 < $GITHUB_WORKSPACE/kernel_patches/69_hide_stuff.patch
 
       - name: Build Kernel/LKM
         working-directory: android-kernel
@@ -214,7 +233,15 @@ jobs:
           if [ ! -z "${{ vars.APP_ID }}" ]; then
             export KSU_MANAGER_PACKAGE=${{ vars.APP_ID }}
           fi
+
+          # Remove check_defconfig
+          sed -i 's/check_defconfig//' ./common/build.config.gki
+
+          # Run perl command to modify UTS_VERSION
+          perl -pi -e 's{UTS_VERSION="\$\(echo \$UTS_VERSION \$CONFIG_FLAGS \$TIMESTAMP \| cut -b -\$UTS_LEN\)"}{UTS_VERSION="#1 SMP PREEMPT Sat Apr 20 04:20:00 UTC 2024"}' ./common/scripts/mkcompile_h
+
           if [ -e build/build.sh ]; then
+            sed -i 's/-dirty//' ./common/scripts/setlocalversion
             LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh CC="/usr/bin/ccache clang"
           else
             tools/bazel run --disk_cache=/home/runner/.cache/bazel --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist

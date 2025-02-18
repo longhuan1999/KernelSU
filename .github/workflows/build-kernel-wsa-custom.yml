@@ -1,7 +1,17 @@
-name: Build Kernel - WSA
+name: custom Build Kernel - WSA
 on:
   workflow_call:
+    inputs:
+      enable_susfs:
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      enable_susfs:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -9,11 +19,12 @@ jobs:
     strategy:
       matrix:
         arch: [x86_64, arm64]
-        version: ["5.15.94.2", "5.15.104.1", "5.15.104.2", "5.15.104.3", "5.15.104.4"]
+        version: ["5.15.104.4",]
     uses: ./.github/workflows/wsa-kernel.yml
     with:
       arch: ${{ matrix.arch }}
       version: ${{ matrix.version }}
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}
 
   check_build:
     if: (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.ref == 'refs/heads/checkci'
@@ -24,3 +35,4 @@ jobs:
     with:
       arch: ${{ matrix.arch }}
       version: "5.15.104.4"
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}

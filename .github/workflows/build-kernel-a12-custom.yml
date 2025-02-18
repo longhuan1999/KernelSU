@@ -1,18 +1,25 @@
-name: Build Kernel - Android 12
+name: custom Build Kernel - Android 12
 on:
   workflow_call:
+    inputs:
+      enable_susfs:
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      enable_susfs:
+        required: false
+        type: boolean
+        default: false
 jobs:
   build-kernel:
     if: github.event_name != 'pull_request' && github.ref != 'refs/heads/checkci'
     strategy:
       matrix:
         include:
-          - sub_level: 209
-            os_patch_level: 2024-05
-          - sub_level: 218
-            os_patch_level: 2024-08
-          - sub_level: 226
-            os_patch_level: 2024-11
+          - sub_level: 198
+            os_patch_level: 2024-01
     uses: ./.github/workflows/gki-kernel.yml
     secrets: inherit
     with:
@@ -21,6 +28,7 @@ jobs:
       tag: android12-5.10-${{ matrix.os_patch_level }}
       os_patch_level: ${{ matrix.os_patch_level }}
       patch_path: "5.10"
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}
   
   upload-artifacts:
     needs: build-kernel
@@ -82,7 +90,7 @@ jobs:
           export VERSION=$(($(git rev-list --count HEAD) + 10200))
           echo "VERSION: $VERSION"
           cd -
-          bash $GITHUB_WORKSPACE/KernelSU/.github/scripts/build_a12.sh
+          bash $GITHUB_WORKSPACE/KernelSU/.github/scripts/build_a12-custom.sh
 
       - name: Display structure of boot files
         run: ls -R
@@ -102,3 +110,4 @@ jobs:
       tag: android12-5.10-2024-11
       os_patch_level: 2024-11
       patch_path: "5.10"
+      enable_susfs: ${{ fromJSON(github.event.inputs.enable_susfs) || false }}

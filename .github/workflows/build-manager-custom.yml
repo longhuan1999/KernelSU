@@ -1,4 +1,4 @@
-name: Build Manager
+name: custom Build Manager
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-lkm:
-    uses: ./.github/workflows/build-lkm.yml
+    uses: ./.github/workflows/build-lkm-custom.yml
     secrets: inherit
 
   build-ksud:
